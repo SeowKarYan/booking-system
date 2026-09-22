@@ -7,5 +7,4 @@ export const sequelize = new Sequelize(DB_NAME || "", DB_USERNAME || "", DB_PASS
     port: Number(DB_PORT),
     dialect: "mysql",
     logging: false,
-    timezone: "+08:00"
 });

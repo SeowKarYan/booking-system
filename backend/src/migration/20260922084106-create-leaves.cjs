@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('working_hour', {
+    await queryInterface.createTable('leave', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -29,10 +29,7 @@ module.exports = {
       doctorId: {
         type: Sequelize.DataTypes.INTEGER,
         references: {
-          model: {
-            tableName: 'doctor',
-            schema: 'schema',
-          },
+          model: 'doctor',
           key: 'id',
         },
         allowNull: false,
@@ -41,6 +38,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('working_hour');
+    await queryInterface.dropTable('leave');
   }
 };

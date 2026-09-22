@@ -34,10 +34,7 @@ module.exports = {
       doctorId: {
         type: Sequelize.DataTypes.INTEGER,
         references: {
-          model: {
-            tableName: 'doctor',
-            schema: 'schema',
-          },
+          model: 'doctor',
           key: 'id',
         },
         allowNull: false,
@@ -45,10 +42,7 @@ module.exports = {
       patientId: {
         type: Sequelize.DataTypes.INTEGER,
         references: {
-          model: {
-            tableName: 'patient',
-            schema: 'schema',
-          },
+          model: 'patient',
           key: 'id',
         },
         allowNull: false,
@@ -56,10 +50,7 @@ module.exports = {
       receptionistId: {
         type: Sequelize.DataTypes.INTEGER,
         references: {
-          model: {
-            tableName: 'receptionist',
-            schema: 'schema',
-          },
+          model: 'receptionist',
           key: 'id',
         },
         allowNull: true,

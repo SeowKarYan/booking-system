@@ -10,12 +10,17 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
+      day: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
       start_time: {
-        type: Sequelize.DATE,
+        type: Sequelize.TIME,
         allowNull: false,
       },
       end_time: {
-        type: Sequelize.DATE,
+        type: Sequelize.TIME,
         allowNull: false,
       },
       createdAt: {

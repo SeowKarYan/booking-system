@@ -7,6 +7,7 @@ class Doctor extends Model<InferAttributes<Doctor>, InferCreationAttributes<Doct
     declare name: string;
     declare email: string;
     declare password: string;
+    declare consultation_period: number;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 }
@@ -33,6 +34,12 @@ Doctor.init(
             type: DataTypes.STRING,
             allowNull: false,
             comment: "password for login"
+        },
+        consultation_period: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 15,
+            comment: "consultation period in minutes (15 or 30 min)"
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,

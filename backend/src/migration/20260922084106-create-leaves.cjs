@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('leave', {
+    await queryInterface.createTable('doctor_leave', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -17,6 +17,11 @@ module.exports = {
       end_time: {
         type: Sequelize.DATE,
         allowNull: false,
+      },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "AL",
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -38,6 +43,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('leave');
+    await queryInterface.dropTable('doctor_leave');
   }
 };

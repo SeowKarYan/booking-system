@@ -5,6 +5,7 @@ import type Doctor from "./Doctor.ts";
 
 class WorkingHour extends Model<InferAttributes<WorkingHour>, InferCreationAttributes<WorkingHour>> {
     declare id: CreationOptional<number>;
+    declare day: number;
     declare start_time: Date;
     declare end_time: Date;
     declare createdAt: CreationOptional<Date>;
@@ -19,15 +20,21 @@ WorkingHour.init(
             autoIncrement: true,
             primaryKey: true,
         },
-        start_time: {
-            type: DataTypes.DATE,
+        day: {
+            type: DataTypes.INTEGER,
             allowNull: false,
-            comment: "starting date and time"
+            defaultValue: 0,
+            comment: "0 - sunday, 6 - saturday"
+        },
+        start_time: {
+            type: DataTypes.TIME,
+            allowNull: false,
+            comment: "starting time"
         },
         end_time: {
-            type: DataTypes.DATE,
+            type: DataTypes.TIME,
             allowNull: false,
-            comment: "ending date and time"
+            comment: "ending time"
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,

@@ -3,16 +3,17 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../function/sequelize.ts";
 import type Doctor from "./Doctor.ts";
 
-class Leave extends Model<InferAttributes<Leave>, InferCreationAttributes<Leave>> {
+class DoctorLeave extends Model<InferAttributes<DoctorLeave>, InferCreationAttributes<DoctorLeave>> {
     declare id: CreationOptional<number>;
     declare start_time: Date;
     declare end_time: Date;
+    declare type: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
     declare doctorId: ForeignKey<Doctor['id']>;
 }
 
-Leave.init(
+DoctorLeave.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -29,15 +30,21 @@ Leave.init(
             allowNull: false,
             comment: "ending date and time"
         },
+        type: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: "AL",
+            comment: "AL / EL"
+        },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
     },
     {
         sequelize,
         comment: "To store all doctor leave",
-        tableName: "leave",
-        modelName: "leave",
+        tableName: "doctor_leave",
+        modelName: "doctor_leave",
     }
 );
 
-export default Leave;
+export default DoctorLeave;

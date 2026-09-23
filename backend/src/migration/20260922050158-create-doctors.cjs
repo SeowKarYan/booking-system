@@ -23,6 +23,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      consultation_period: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 15,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

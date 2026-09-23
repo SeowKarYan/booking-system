@@ -15,6 +15,7 @@ module.exports = {
         name: faker.person.fullName(),
         email: emails[i],
         password: bcrypt.hashSync("password", 10),
+        consultation_period: faker.helpers.arrayElement([15, 30]),
         createdAt: now,
         updatedAt: now,
       })

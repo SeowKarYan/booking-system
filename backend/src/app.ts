@@ -3,7 +3,8 @@ import path from 'path';
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-// import authRoutes from "./routes/auth.ts"
+import authRoutes from "./routes/auth.ts"
+import doctorRoutes from "./routes/doctors.ts"
 
 const app: Express = express();
 
@@ -20,7 +21,8 @@ app.use(cors({
 }));
 
 // Routes
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/doctors", doctorRoutes);
 
 // serve static files
 app.use('/', express.static(path.join(import.meta.dirname, "..", "frontend", "dist")));

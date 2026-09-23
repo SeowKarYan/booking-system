@@ -15,11 +15,12 @@ export const sessionAuthentication = (req: Request, res: Response, next: NextFun
         const payload = jwt.verify(token, process.env.JWT_SECRET);
 
         req.user = {
-            id: Number((payload as jwt.JwtPayload).id)
+            id: Number((payload as jwt.JwtPayload).id),
+            role: (payload as jwt.JwtPayload).role
         };
 
         next();
     } catch {
-        return res.status(401).json({ message: "Invalid or expired session" });
+        return res.status(401).json({ message: "Session Expired" });
     }
 };

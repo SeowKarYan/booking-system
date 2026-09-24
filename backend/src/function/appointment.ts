@@ -107,10 +107,15 @@ export const getAvailableTimeslot = async (
                         startMinutes % 60
                     );
 
+                    // check whether slot already pass
+                    if (slotStart <= new Date()) {
+                        continue;
+                    }
+
                     const slotEnd = addMinutes(slotStart, slotDuration);
 
                     // check leave
-                    const isOnLeave = doctor.doctor_leaves?.some(leave => 
+                    const isOnLeave = doctor.doctor_leaves?.some(leave =>
                         isOverlapping(
                             new Date(slotStart),
                             new Date(slotEnd),
@@ -124,7 +129,7 @@ export const getAvailableTimeslot = async (
                     }
 
                     // check booking
-                    const isBooked = doctor.bookings?.some(booking => 
+                    const isBooked = doctor.bookings?.some(booking =>
                         isOverlapping(
                             new Date(slotStart),
                             new Date(slotEnd),

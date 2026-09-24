@@ -16,6 +16,10 @@ router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Missing required fields", status: "failed" })
         }
 
+        if (new Date(startTime) <= new Date()) {
+            return res.status(400).json({ message: "Cannot booking for past date", status: "failed" })
+        }
+
         const doctor = await Doctor.findByPk(doctorId)
         if (!doctor) {
             return res.status(404).json({ message: "Doctor not found", status: "failed" })
@@ -33,7 +37,8 @@ router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
                 end_time: {
                     [Op.gt]: slotStart
                 },
-                status: "Booked"
+                status: "Booked",
+                doctorId,
             }
         })
 
@@ -49,6 +54,7 @@ router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
                 end_time: {
                     [Op.gt]: slotStart
                 },
+                doctorId,
             }
         })
 
@@ -129,6 +135,10 @@ router.patch("/:bookingId", sessionAuthentication, async (req: Request, res: Res
 
         if (req.user?.role === "Patient" && booking.patientId !== req.user?.id) {
             return res.status(403).json({ message: "You are not allowed to update this booking", status: "failed" })
+        }
+
+        if (status !== "Cancel") {
+            return res.status(400).json({ message: "Invalid status", status: "failed" })
         }
 
         booking.status = status

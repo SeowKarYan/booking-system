@@ -9,7 +9,9 @@
     "db:create": "npx sequelize-cli db:create",
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:seed": "npx sequelize-cli db:seed:all",
-    "db:seed:undo": "npx sequelize-cli db:seed:undo:all"
+    "db:seed:undo": "npx sequelize-cli db:seed:undo:all",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -34,7 +36,10 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.2",
+    "@types/supertest": "^7.2.1",
     "sequelize-cli": "^6.6.5",
-    "typescript": "^7.0.2"
+    "supertest": "^7.3.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
   }
 }

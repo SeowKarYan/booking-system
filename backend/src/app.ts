@@ -5,6 +5,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.ts"
 import doctorRoutes from "./routes/doctors.ts"
+import bookingRoutes from "./routes/bookings.ts"
 
 const app: Express = express();
 
@@ -23,6 +24,7 @@ app.use(cors({
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/doctors", doctorRoutes);
+app.use("/api/bookings", bookingRoutes)
 
 // serve static files
 app.use('/', express.static(path.join(import.meta.dirname, "..", "frontend", "dist")));

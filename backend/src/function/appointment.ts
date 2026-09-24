@@ -149,6 +149,6 @@ export const getAvailableTimeslot = async (
         return availableSlots;
     } catch (error) {
         console.error("Error get available timeslot", error)
-        throw new Error("Error get available timeslot")
+        throw new Error(error instanceof Error ? error.message : "Error get available timeslot")
     }
 }

@@ -10,6 +10,7 @@ class Booking extends Model<InferAttributes<Booking>, InferCreationAttributes<Bo
     declare status: string;
     declare start_time: Date;
     declare end_time: Date;
+    declare booked_unique: boolean | null;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
     declare doctorId: ForeignKey<Doctor['id']>;
@@ -39,6 +40,11 @@ Booking.init(
             type: DataTypes.DATE,
             allowNull: false,
             comment: "booking date and end time"
+        },
+        booked_unique: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            comment: "unique index for block duplicate booking"
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,

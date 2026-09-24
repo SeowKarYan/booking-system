@@ -1,6 +1,9 @@
-import type { InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
+import type { InferAttributes, InferCreationAttributes, CreationOptional, NonAttribute } from "sequelize";
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../function/sequelize.ts";
+import type WorkingHour from "./WorkingHour.ts";
+import type Booking from "./Booking.ts";
+import type DoctorLeave from "./DoctorLeave.ts";
 
 class Doctor extends Model<InferAttributes<Doctor>, InferCreationAttributes<Doctor>> {
     declare id: CreationOptional<number>;
@@ -10,6 +13,9 @@ class Doctor extends Model<InferAttributes<Doctor>, InferCreationAttributes<Doct
     declare consultation_period: number;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+    declare working_hours?: NonAttribute<WorkingHour[]>;
+    declare bookings?: NonAttribute<Booking[]>;
+    declare doctor_leaves?: NonAttribute<DoctorLeave[]>;
 }
 
 Doctor.init(

@@ -6,8 +6,8 @@ import type Doctor from "./Doctor.ts";
 class WorkingHour extends Model<InferAttributes<WorkingHour>, InferCreationAttributes<WorkingHour>> {
     declare id: CreationOptional<number>;
     declare day: number;
-    declare start_time: Date;
-    declare end_time: Date;
+    declare start_time: string;
+    declare end_time: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
     declare doctorId: ForeignKey<Doctor['id']>;

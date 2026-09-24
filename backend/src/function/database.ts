@@ -9,15 +9,6 @@ export const connectDatabase = async () => {
     }
 }
 
-export const syncDatabase = async () => {
-    try {
-        await sequelize.sync({ alter: true })
-        console.log('Database synchronized successfully.');
-    } catch (error) {
-        console.error('Unable to sync the database:', error);
-    }
-}
-
 export const disconnectDatabase = async () => {
     try {
         await sequelize.close()

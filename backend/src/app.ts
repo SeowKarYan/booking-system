@@ -6,6 +6,8 @@ import cors from "cors";
 import authRoutes from "./routes/auth.ts"
 import doctorRoutes from "./routes/doctors.ts"
 import bookingRoutes from "./routes/bookings.ts"
+import leaveRoutes from "./routes/leaves.ts";
+import workingHourRoutes from "./routes/workingHours.ts"
 
 const app: Express = express();
 
@@ -24,18 +26,20 @@ app.use(cors({
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/doctors", doctorRoutes);
-app.use("/api/bookings", bookingRoutes)
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/leaves", leaveRoutes);
+app.use("/api/working_hours", workingHourRoutes);
 
 // serve static files
-app.use('/', express.static(path.join(import.meta.dirname, "..", "frontend", "dist")));
+app.use('/', express.static(path.join(import.meta.dirname, "..", "..", "frontend", "dist")));
 app.get("/{*app}", (req, res) => {
-    res.sendFile(path.join(import.meta.dirname, "..", "frontend", "dist", "index.html"));
+    res.sendFile(path.join(import.meta.dirname, "..", "..", "frontend", "dist", "index.html"));
 });
 
 // Error handling middleware 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error', status: "failed" });
 });
 
 export default app;

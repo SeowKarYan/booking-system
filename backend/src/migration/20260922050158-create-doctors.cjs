@@ -26,7 +26,7 @@ module.exports = {
       consultation_period: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 15,
+        defaultValue: 60,
       },
       createdAt: {
         type: Sequelize.DATE,

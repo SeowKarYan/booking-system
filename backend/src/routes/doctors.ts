@@ -21,11 +21,11 @@ router.get("/", sessionAuthentication, async (req: Request, res: Response) => {
 router.get("/:doctorId/slots", sessionAuthentication, async (req: Request, res: Response) => {
     try {
         const { doctorId } = req.params;
-        const { start, end } = req.query
+        const { start_time, end_time } = req.query
 
         try {
-            let startParam = typeof start === "string" ? new Date(start) : undefined;
-            let endParam = typeof end === "string" ? new Date(end) : undefined;
+            let startParam = typeof start_time === "string" ? new Date(start_time) : undefined;
+            let endParam = typeof end_time === "string" ? new Date(end_time) : undefined;
 
             const data = await getAvailableTimeslot(Number(doctorId), startParam, endParam)
 

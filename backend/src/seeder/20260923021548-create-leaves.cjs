@@ -1,6 +1,6 @@
 'use strict';
 const { faker } = require('@faker-js/faker');
-const { startOfWeek, addWeeks } = require('date-fns');
+const { startOfWeek, addWeeks, setHours, addHours, addDays } = require('date-fns');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -11,17 +11,14 @@ module.exports = {
       `
         SELECT id
         FROM doctor
-        ORDER BY id
-        LIMIT 50
       `, { type: queryInterface.sequelize.QueryTypes.SELECT });
 
     for (const doctor of doctors) {
       const workingHours = await queryInterface.sequelize.query(
         `
-        SELECT day
+        SELECT day, start_time
         FROM working_hour
         WHERE doctorId = :doctorId
-        GROUP BY day
       `,
         {
           replacements: { doctorId: doctor.id },
@@ -29,19 +26,24 @@ module.exports = {
         }
       );
 
-      // random choose 1 day as annual leave
+      // random choose 1 hour to block
       const doctorLeaveDay = faker.helpers.arrayElement(workingHours);
 
-      const result = startOfWeek(new Date(), { weekStartsOn: doctorLeaveDay.day })
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 })
+      const weekDay = addDays(weekStart, doctorLeaveDay.day)
 
-      const randomWeek = faker.helpers.arrayElement([1, 2, 3, 4, 5, 6, 7, 8])
+      const randomWeek = faker.helpers.arrayElement([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
 
-      let doctorLeaveDate = addWeeks(result, randomWeek)
+      let doctorLeaveDate = addWeeks(weekDay, randomWeek)
+
+      let hour = doctorLeaveDay.start_time.split(":")[0]
+      let doctorLeaveStart = setHours(doctorLeaveDate, hour)
+      let doctorLeaveEnd = addHours(doctorLeaveStart, 1)
 
       data.push({
-        start_time: new Date(new Date(doctorLeaveDate).setHours(0, 0, 0, 0)),
-        end_time: new Date(new Date(doctorLeaveDate).setHours(23, 59, 59, 999)),
-        type: "AL",
+        start_time: doctorLeaveStart,
+        end_time: doctorLeaveEnd,
+        type: "Meeting",
         createdAt: new Date(),
         updatedAt: new Date(),
         doctorId: doctor.id,

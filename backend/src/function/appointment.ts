@@ -22,7 +22,7 @@ const isOverlapping = (
 export const getAvailableTimeslot = async (
     doctorId: number,
     startDate = new Date(),
-    endDate = addDays(new Date(), 29),
+    endDate = new Date(),
 ): Promise<{ start: Date, end: Date }[]> => {
 
     try {
@@ -77,10 +77,6 @@ export const getAvailableTimeslot = async (
 
         const days = differenceInDays(end, start) + 1;
 
-        if (days > 30) {
-            throw new Error("Date range cannot exceed 30 days")
-        }
-
         for (let i = 0; i < days; i++) {
 
             const currentDate = addDays(start, i);
@@ -94,7 +90,7 @@ export const getAvailableTimeslot = async (
             for (const workingHour of todayWorkingHours) {
 
                 const workStart = timeToMinutes(workingHour.start_time);
-                const workEnd = timeToMinutes(workingHour.end_time);
+                const workEnd = timeToMinutes(workingHour.end_time === "00:00:00" ? "24:00:00" : workingHour.end_time);
 
                 for (
                     let startMinutes = workStart;

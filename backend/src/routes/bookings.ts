@@ -4,19 +4,20 @@ import Doctor from '../model/Doctor.ts';
 import Booking from '../model/Booking.ts';
 import { Op, UniqueConstraintError, type WhereOptions } from 'sequelize';
 import DoctorLeave from '../model/DoctorLeave.ts';
-import { addDays, addMinutes } from 'date-fns';
+import { addMinutes } from 'date-fns';
+import Patient from '../model/Patient.ts';
 
 const router = express.Router();
 
 router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
     try {
-        const { startTime, doctorId } = req.body
+        const { start_time, doctorId } = req.body
 
-        if (!doctorId || !startTime) {
+        if (!doctorId || !start_time) {
             return res.status(400).json({ message: "Missing required fields", status: "failed" })
         }
 
-        if (new Date(startTime) <= new Date()) {
+        if (new Date(start_time) <= new Date()) {
             return res.status(400).json({ message: "Cannot booking for past date", status: "failed" })
         }
 
@@ -25,7 +26,7 @@ router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Doctor not found", status: "failed" })
         }
 
-        let slotStart = new Date(startTime)
+        let slotStart = new Date(start_time)
         let duration = doctor.consultation_period
         let slotEnd = addMinutes(slotStart, duration)
 
@@ -90,7 +91,7 @@ router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
 
 router.get("/", sessionAuthentication, async (req: Request, res: Response) => {
     try {
-        const { patientId, doctorId, startTime, endTime, status } = req.query
+        const { patientId, doctorId, start_time, end_time, status } = req.query
 
         const where: WhereOptions = {};
 
@@ -108,15 +109,21 @@ router.get("/", sessionAuthentication, async (req: Request, res: Response) => {
             where.status = status
         }
 
-        if (typeof startTime === "string" && typeof endTime === "string") {
-            where.start_time = { [Op.lt]: new Date(endTime) };
-            where.end_time = { [Op.gt]: new Date(startTime) };
+        if (typeof start_time === "string" && typeof end_time === "string") {
+            where.start_time = { [Op.lt]: new Date(end_time) };
+            where.end_time = { [Op.gt]: new Date(start_time) };
         } else {
-            where.start_time = { [Op.lt]: addDays(new Date(), 30) };
+            where.start_time = { [Op.lt]: new Date() };
             where.end_time = { [Op.gt]: new Date() };
         }
 
-        const data = await Booking.findAll({ where })
+        const data = await Booking.findAll({
+            where,
+            include: [
+                { model: Doctor, attributes: ['name', 'email'] },
+                { model: Patient, attributes: ['name', 'email'] }
+            ]
+        })
 
         return res.status(200).json({ data, message: "Booking fetched successfully", status: "success" })
     } catch (error) {

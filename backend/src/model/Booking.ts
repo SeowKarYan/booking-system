@@ -1,4 +1,4 @@
-import type { InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from "sequelize";
+import type { InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey, NonAttribute } from "sequelize";
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../function/sequelize.ts";
 import type Doctor from "./Doctor.ts";
@@ -16,6 +16,8 @@ class Booking extends Model<InferAttributes<Booking>, InferCreationAttributes<Bo
     declare doctorId: ForeignKey<Doctor['id']>;
     declare patientId: ForeignKey<Patient['id']>;
     declare receptionistId: ForeignKey<Receptionist['id']>;
+    declare doctor?: NonAttribute<Doctor>;
+    declare patient?: NonAttribute<Patient>;
 }
 
 Booking.init(

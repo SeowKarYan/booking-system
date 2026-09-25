@@ -1,4 +1,4 @@
-import type { InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from "sequelize";
+import type { InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey, NonAttribute } from "sequelize";
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../function/sequelize.ts";
 import type Doctor from "./Doctor.ts";
@@ -11,6 +11,7 @@ class DoctorLeave extends Model<InferAttributes<DoctorLeave>, InferCreationAttri
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
     declare doctorId: ForeignKey<Doctor['id']>;
+    declare doctor?: NonAttribute<Doctor>;
 }
 
 DoctorLeave.init(

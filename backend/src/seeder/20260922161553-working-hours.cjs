@@ -10,36 +10,31 @@ module.exports = {
       `
         SELECT id
         FROM doctor
-        ORDER BY id
-        LIMIT 50
       `, { type: queryInterface.sequelize.QueryTypes.SELECT });
 
+    let working_shift = [
+      { start_time: "00:00:00.000", end_time: "08:00:00.000" },
+      { start_time: "08:00:00.000", end_time: "16:00:00.000" },
+      { start_time: "16:00:00.000", end_time: "00:00:00.000" },
+    ]
+
     for (const doctor of doctors) {
-      // Randomly choose 4–6 days from Sun - Sat
       const days = faker.helpers.shuffle([0, 1, 2, 3, 4, 5, 6]);
 
       const numberOfWorkingDays = faker.number.int({
-        min: 4,
+        min: 5,
         max: 6,
       });
 
       const workingDays = days.slice(0, numberOfWorkingDays);
 
       for (const day of workingDays) {
-        // 9am to 1pm and 2pm to 5pm
+        let selectedShift = faker.helpers.arrayElement(working_shift)
         data.push(
           {
             day,
-            start_time: "09:00:00.000",
-            end_time: "13:00:00.000",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            doctorId: doctor.id
-          },
-          {
-            day,
-            start_time: "14:00:00.000",
-            end_time: "17:00:00.000",
+            start_time: selectedShift.start_time,
+            end_time: selectedShift.end_time,
             createdAt: new Date(),
             updatedAt: new Date(),
             doctorId: doctor.id

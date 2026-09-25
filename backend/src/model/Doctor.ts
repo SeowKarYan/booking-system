@@ -44,8 +44,8 @@ Doctor.init(
         consultation_period: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: 15,
-            comment: "consultation period in minutes (15 or 30 min)"
+            defaultValue: 60,
+            comment: "consultation period in minutes, default 60 min"
         },
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,

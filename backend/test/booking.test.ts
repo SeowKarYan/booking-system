@@ -6,6 +6,7 @@ import Booking from "../src/model/Booking.ts";
 import Patient from "../src/model/Patient.ts";
 import { Op } from "sequelize";
 import Doctor from "../src/model/Doctor.ts";
+import { addDays, format } from "date-fns";
 
 const agent = request.agent(app);
 const agent2 = request.agent(app);
@@ -46,8 +47,10 @@ afterAll(async () => {
 describe("POST /api/bookings/", () => {
     it("should allow only one patient to book the same slot", async () => {
         let doctor = await Doctor.findOne({ where: {} })
+        let start = format(new Date(), "yyyy-MM-dd")
+        let end = addDays(start, 7)
         const availableSlotResponse = await agent
-            .get(`/api/doctors/${doctor?.id}/slots`)
+            .get(`/api/doctors/${doctor?.id}/slots?start_time=${start}&end_time=${end}`)
 
         let startTime = availableSlotResponse.body.data[0].start;
 

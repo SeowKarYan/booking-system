@@ -1,28 +1,16 @@
 'use strict';
 const { faker } = require('@faker-js/faker');
-const { addWeeks, addDays, format, startOfWeek, addMinutes } = require('date-fns');
+const { addWeeks, addDays, startOfWeek, addMinutes, setMinutes, setHours } = require('date-fns');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     let data = []
 
-    let availableslot = [
-      { hour: 9, minute: 0 },
-      { hour: 9, minute: 30 },
-      { hour: 10, minute: 0 },
-      { hour: 10, minute: 30 },
-      { hour: 11, minute: 0 },
-      { hour: 11, minute: 30 },
-      { hour: 12, minute: 0 },
-      { hour: 12, minute: 30 },
-      { hour: 14, minute: 0 },
-      { hour: 14, minute: 30 },
-      { hour: 15, minute: 0 },
-      { hour: 15, minute: 30 },
-      { hour: 16, minute: 0 },
-      { hour: 16, minute: 30 },
-    ]
+    const timeToMinutes = (time) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      return hours * 60 + minutes;
+    }
 
     const patients = await queryInterface.sequelize.query(
       `
@@ -34,15 +22,12 @@ module.exports = {
       `
         SELECT id, consultation_period
         FROM doctor
-        ORDER BY id
-        LIMIT 50
       `, { type: queryInterface.sequelize.QueryTypes.SELECT });
 
     const workingHours = await queryInterface.sequelize.query(
       `
-        SELECT doctorId, day
+        SELECT doctorId, day, start_time, end_time
         FROM working_hour
-        GROUP BY day, doctorId
       `, { type: queryInterface.sequelize.QueryTypes.SELECT });
 
     const leaves = await queryInterface.sequelize.query(
@@ -51,56 +36,63 @@ module.exports = {
         FROM doctor_leave
       `, { type: queryInterface.sequelize.QueryTypes.SELECT });
 
-    // 5000 booking for 12 months, each doctor have 1 - 2 booking within a week
+    // 20 doctors 5000 booking for 3 months
     for (const doctor of doctors) {
-      let doctorWorkingDays = workingHours.filter(wh => wh.doctorId === doctor.id).map(wh => wh.day)
-      let doctorLeaves = leaves.filter(leave => leave.doctorId === doctor.id).map(leave => format(new Date(leave.end_time), 'yyyy-MM-dd'))
-      let consultationDuration = doctor.consultation_period
+      let doctorWorkingDays = workingHours.filter(wh => wh.doctorId === doctor.id)
+      let doctorLeaves = leaves.filter(leave => leave.doctorId === doctor.id)
+      let slotDuration = doctor.consultation_period
 
-      for (let i = 0; i < 52; i++) {
-        let firstBookingDay = faker.helpers.arrayElement(doctorWorkingDays);
-        let secondBookingDay = faker.helpers.arrayElement(doctorWorkingDays.filter(day => day !== firstBookingDay));
-
-        let firstBookingTimeslot = faker.helpers.arrayElement(availableslot)
-        let secondBookingTImeslot = faker.helpers.arrayElement(availableslot)
+      for (const workingDay of doctorWorkingDays) {
+        let timeslot = []
+        const workStart = timeToMinutes(workingDay.start_time);
+        const workEnd = timeToMinutes(workingDay.end_time === "00:00:00" ? "24:00:00" : workingDay.end_time);
 
         const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 })
+        const startingDate = addDays(weekStart, workingDay.day)
 
-        let firstBookingDate = addDays(addWeeks(weekStart, i), firstBookingDay)
-        let secondBookingDate = addDays(addWeeks(weekStart, i), secondBookingDay)
+        for (
+          let startMinutes = workStart;
+          startMinutes + slotDuration <= workEnd;
+          startMinutes += slotDuration
+        ) {
 
-        let firstBookingDateTime = new Date(new Date(firstBookingDate).setHours(firstBookingTimeslot.hour, firstBookingTimeslot.minute))
-        let secondBookingDateTime = new Date(new Date(secondBookingDate).setHours(secondBookingTImeslot.hour, secondBookingTImeslot.minute))
+          const slotStart = setMinutes(
+            setHours(startingDate, Math.floor(startMinutes / 60)),
+            startMinutes % 60
+          );
 
-        if (!doctorLeaves.includes(format(firstBookingDateTime, 'yyyy-MM-dd'))) {
-          let patient = faker.helpers.arrayElement(patients)
-          data.push({
-            status: "Booked",
-            start_time: firstBookingDateTime,
-            end_time: addMinutes(firstBookingDateTime, consultationDuration),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            doctorId: doctor.id,
-            patientId: patient.id
+          const slotEnd = addMinutes(slotStart, slotDuration);
+
+          timeslot.push({
+            start: slotStart,
+            end: slotEnd
           })
         }
 
-        if (!doctorLeaves.includes(format(secondBookingDateTime, 'yyyy-MM-dd'))) {
-          let patient = faker.helpers.arrayElement(patients)
-          data.push({
-            status: "Booked",
-            start_time: secondBookingDateTime,
-            end_time: addMinutes(secondBookingDateTime, consultationDuration),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            doctorId: doctor.id,
-            patientId: patient.id
-          })
-        }
+        // 13 weeks for 3 months
+        for (let i = 0; i < 13; i++) {
+          let shuffleTimeslot = faker.helpers.shuffle(timeslot);
+          // select 4 timeslot for a day
+          let selectedTimeslot = shuffleTimeslot.slice(0, 4)
 
-        if (data.length >= 1000) {
-          await queryInterface.bulkInsert('booking', data, {});
-          data = []
+          for (let j = 0; j < selectedTimeslot.length; j++) {
+            let bookingStart = addWeeks(selectedTimeslot[j].start, i)
+            let bookingEnd = addWeeks(selectedTimeslot[j].end, i)
+
+            let isOnLeave = doctorLeaves.filter(leave => leave.start_time < bookingEnd && leave.end_time > bookingStart)[0]
+            if (!isOnLeave) {
+              let patient = faker.helpers.arrayElement(patients)
+              data.push({
+                status: "Booked",
+                start_time: bookingStart,
+                end_time: bookingEnd,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                doctorId: doctor.id,
+                patientId: patient.id
+              })
+            }
+          }
         }
       }
     }

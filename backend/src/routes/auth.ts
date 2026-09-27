@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Patient from '../model/Patient.ts';
 import Receptionist from '../model/Receptionist.ts';
+import { sessionAuthentication } from '../function/middleware.ts';
 
 const router = express.Router();
 
@@ -39,7 +40,7 @@ router.post("/login", async (req: Request, res: Response) => {
                 maxAge: 60 * 60 * 1000
             });
 
-            let data =  {
+            let data = {
                 id: foundUser.id,
                 name: foundUser.name,
                 role,
@@ -49,6 +50,30 @@ router.post("/login", async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Password is incorrect", status: "failed" });
         }
 
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error", status: "failed" })
+    }
+})
+
+router.post("/checkSession", sessionAuthentication, async (req: Request, res: Response) => {
+    try {
+        let foundUser = null
+        if (req.user?.role === "Patient") {
+            foundUser = await Patient.findByPk(req.user?.id)
+        } else if (req.user?.role === "Receptionist") {
+            foundUser = await Receptionist.findByPk(req.user?.id)
+        }
+
+        if (!foundUser) {
+            return res.status(404).json({ message: "User not found", status: "failed" });
+        }
+
+        let data = {
+            id: foundUser.id,
+            name: foundUser.name,
+            role: req.user?.role,
+        }
+        return res.status(200).json({ data, message: "Check session successfully", status: "success" });
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error", status: "failed" })
     }

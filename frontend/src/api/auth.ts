@@ -8,6 +8,11 @@ export async function login(body: loginRequest) {
     return response.data
 }
 
+export async function checkSession() {
+    const response = await api.post(`${baseURL}/checkSession`)
+    return response.data
+}
+
 export async function logout() {
     const response = await api.post(`${baseURL}/logout`)
     return response.data

@@ -10,9 +10,14 @@ const router = createRouter({
       component: LoginView,
     },
     {
-      path: '/booking',
-      name: 'booking',
-      component: () => import('../views/BookingView.vue'),
+      path: '/patient/schedule',
+      name: 'patient_schedule',
+      component: () => import('../views/patient/ScheduleView.vue'),
+    },
+    {
+      path: '/receptionist/schedule',
+      name: 'receptionist_schedule',
+      component: () => import('../views/receptionist/ScheduleView.vue'),
     },
   ],
 })

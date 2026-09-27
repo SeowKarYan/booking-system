@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { login } from "../../api/auth";
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useMutation } from "@tanstack/vue-query";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "../../stores/auth";
+
+const authStore = useAuthStore();
 
 const router = useRouter();
 
@@ -13,7 +16,10 @@ const password = ref(null);
 const mutation = useMutation({
   mutationFn: login,
   onSuccess: (data) => {
-    router.push("/booking");
+    authStore.setUser(data.data);
+    router.push(
+      role.value === "Patient" ? "/patient/schedule" : "/receptionist/schedule"
+    );
   },
 });
 
@@ -62,7 +68,10 @@ const onSubmit = async () => {
       <v-alert
         v-if="mutation.isError.value"
         title="Error"
-        :text="mutation.error?.value?.response?.data?.message || mutation.error?.value?.message"
+        :text="
+          mutation.error?.value?.response?.data?.message ||
+          mutation.error?.value?.message
+        "
         type="error"
         color="red-darken-1"
         closable

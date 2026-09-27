@@ -38,7 +38,13 @@ router.post("/login", async (req: Request, res: Response) => {
                 sameSite: "lax",
                 maxAge: 60 * 60 * 1000
             });
-            return res.status(200).json({ message: "Login successfully", status: "success" });
+
+            let data =  {
+                id: foundUser.id,
+                name: foundUser.name,
+                role,
+            }
+            return res.status(200).json({ data, message: "Login successfully", status: "success" });
         } else {
             return res.status(400).json({ message: "Password is incorrect", status: "failed" });
         }

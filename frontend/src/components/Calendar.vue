@@ -24,7 +24,7 @@ function getEventColor(event: CalendarEvent): string {
 
 <template>
     <v-sheet>
-        <v-calendar v-model="focus" :categories="categories" :event-color="getEventColor"
+        <v-calendar class="overflow-x-auto" v-model="focus" :categories="categories" :event-color="getEventColor"
             :events="events" color="primary" type="category" category-show-all></v-calendar>
     </v-sheet>
 </template>

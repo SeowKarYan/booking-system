@@ -23,9 +23,7 @@ const mutation = useMutation<
   mutationFn: login,
   onSuccess: (data) => {
     authStore.setUser(data.data);
-    router.push(
-      role.value === "Patient" ? "/patient/schedule" : "/receptionist/schedule"
-    );
+    router.push("/schedule");
   },
 });
 

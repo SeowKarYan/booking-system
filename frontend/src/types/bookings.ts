@@ -26,6 +26,18 @@ type Booking = {
     }
 }
 
+export type createBookingResponse = {
+    data: {
+        status: string;
+        start_time: string;
+        end_time: string;
+        doctorId: number;
+        patientId: number;
+    };
+    message: string;
+    status: string;
+}
+
 export type getBookingResponse = {
     data: Booking[];
     message: string;

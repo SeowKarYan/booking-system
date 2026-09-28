@@ -2,12 +2,17 @@
 import { getDoctorList, getDoctorSlot } from '@/api/doctor';
 import Toolbar from '@/components/Toolbar.vue';
 import type { Doctor, getDoctorListResponse, getDoctorSlotResponse } from '@/types/doctors';
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useMutation } from "@tanstack/vue-query";
 import type { AxiosError } from 'axios';
 import { computed, ref } from 'vue';
 import { startOfDay, endOfDay, format } from "date-fns"
 import Calendar from '@/components/Calendar.vue';
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
+import type { createBookingRequest, createBookingResponse } from '@/types/bookings';
+import { createBooking } from '@/api/bookings';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const selectedDoctor = ref<Doctor | null>(null)
 const date = ref(new Date())
@@ -67,6 +72,27 @@ const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
     }
     nativeEvent.stopPropagation()
 }
+
+const mutation = useMutation<
+    createBookingResponse,
+    AxiosError<{ message: string }>,
+    createBookingRequest
+>({
+    mutationFn: createBooking,
+    onSuccess: () => {
+        router.push("/schedule");
+    },
+});
+
+const confirmBooking = async () => {
+    if (selectedDoctor.value?.id && selectedEvent) {
+        let body = {
+            doctorId: selectedDoctor.value?.id,
+            start_time: selectedEvent.value?.start
+        }
+        mutation.mutate(body);
+    }
+}
 </script>
 
 <template>
@@ -106,6 +132,11 @@ const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </v-toolbar>
+                <v-container v-if="mutation.isError.value">
+                    <v-alert title="Error" :text="mutation.error?.value?.response?.data?.message ||
+                        mutation.error?.value?.message
+                        " type="error" color="red-darken-1" closable density="compact"></v-alert>
+                </v-container>
                 <v-card-title>Confirmation</v-card-title>
                 <v-card-subtitle>Are you sure you want to make appointment with following details?</v-card-subtitle>
                 <v-card-text>
@@ -117,7 +148,7 @@ const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
                     <p></p>
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary">Confirm</v-btn>
+                    <v-btn color="primary" @click="confirmBooking" :loading="mutation.isPending.value">Confirm</v-btn>
                 </v-card-actions>
             </v-card>
         </v-menu>

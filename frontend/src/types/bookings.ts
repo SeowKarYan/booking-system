@@ -11,6 +11,27 @@ export type getBookingParams = {
     status?: string;
 }
 
+type Booking = {
+    id: number;
+    status: string;
+    start_time: string;
+    end_time: string;
+    doctor: {
+        name: string;
+        email: string;
+    },
+    patient: {
+        name: string;
+        email: string;
+    }
+}
+
+export type getBookingResponse = {
+    data: Booking[];
+    message: string;
+    status: string;
+}
+
 export type updateBookingRequest = {
     status: string;
 }

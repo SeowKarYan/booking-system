@@ -8,7 +8,7 @@ export const useAuthStore = defineStore("auth", {
       name: string;
       role: "Patient" | "Receptionist";
     } | null,
-    checkedSession: false
+    checkSession: false
   }),
 
   getters: {
@@ -16,7 +16,7 @@ export const useAuthStore = defineStore("auth", {
     id: (state) => state.user?.id,
     role: (state) => state.user?.role,
     name: (state) => state.user?.name,
-    checkedSession: (state) => state.checkedSession
+    checkedSession: (state) => state.checkSession
   },
 
   actions: {
@@ -39,7 +39,7 @@ export const useAuthStore = defineStore("auth", {
       } catch {
         this.user = null;
       } finally {
-        this.checkedSession = true
+        this.checkSession = true
       }
     }
   },

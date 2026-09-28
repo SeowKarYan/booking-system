@@ -4,6 +4,8 @@ import { login } from "../../api/auth";
 import { useMutation } from "@tanstack/vue-query";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+import type { AxiosError } from "axios";
+import type { loginRequest, loginResponse } from "@/types/auth";
 
 const authStore = useAuthStore();
 
@@ -13,7 +15,11 @@ const role = ref("Patient");
 const email = ref(null);
 const password = ref(null);
 
-const mutation = useMutation({
+const mutation = useMutation<
+  loginResponse,
+  AxiosError<{ message: string }>,
+  loginRequest
+>({
   mutationFn: login,
   onSuccess: (data) => {
     authStore.setUser(data.data);

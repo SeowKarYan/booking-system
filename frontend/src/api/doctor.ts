@@ -9,6 +9,6 @@ export async function getDoctorList() {
 }
 
 export async function getDoctorSlot(id: number, params: getDoctorSlotParams) {
-    const response = await api.get(`${baseURL}/${id}`, { params })
+    const response = await api.get(`${baseURL}/${id}/slots`, { params })
     return response.data
 }

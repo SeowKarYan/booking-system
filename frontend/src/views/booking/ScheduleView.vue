@@ -11,8 +11,11 @@ import type { AxiosError } from "axios";
 import type { CalendarEvent } from "vuetify/lib/components/VCalendar/types.mjs";
 import type { getLeaveResponse } from "@/types/leaves.ts";
 import { getLeave } from "@/api/leaves.ts";
+import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
+
+const router = useRouter();
 
 const date = ref(new Date())
 const selectedEvent = ref<CalendarEvent | null>(null)
@@ -94,15 +97,25 @@ const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
 <template>
   <div>
     <Toolbar :title="authStore.role === 'Patient' ? 'My Bookings' : 'Doctor Schedule'" />
+    <p class="text-center">Welcome, {{ authStore.name }}</p>
 
-    <v-alert v-if="isError || isLeaveError" class="mb-3" title="Error"
-      :text="error?.response?.data?.message || error?.message || leaveError?.response?.data?.message || leaveError?.message"
-      type="error" color="red-darken-1" closable density="compact">
-    </v-alert>
+    <div class="d-flex justify-end pe-2 pb-2">
+      <div v-if="authStore.role === 'Receptionist'">
+        <v-btn color="primary" @click="router.push('/leave')">Apply Leave</v-btn>
+      </div>
+      <div v-else>
+        <v-btn color="primary" @click="router.push('/booking')">Make Appointment</v-btn>
+      </div>
+    </div>
 
-    <v-sheet tile>
+    <v-container>
+      <v-alert v-if="isError || isLeaveError" class="mb-3" title="Error"
+        :text="error?.response?.data?.message || error?.message || leaveError?.response?.data?.message || leaveError?.message"
+        type="error" color="red-darken-1" closable density="compact">
+      </v-alert>
+
       <v-date-input label="Select Date" v-model="date"></v-date-input>
-    </v-sheet>
+    </v-container>
 
     <div class="text-center" v-if="isFetching || isLeaveFetching">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>

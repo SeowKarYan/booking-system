@@ -15,6 +15,16 @@ const router = createRouter({
       name: 'schedule',
       component: () => import('../views/booking/ScheduleView.vue'),
     },
+    {
+      path: '/booking',
+      name: 'booking',
+      component: () => import('../views/booking/BookingView.vue'),
+    },
+    {
+      path: '/leave',
+      name: 'leave',
+      component: () => import('../views/leave/ApplyLeaveView.vue'),
+    },
   ],
 })
 

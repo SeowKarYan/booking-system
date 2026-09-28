@@ -22,7 +22,7 @@ const mutation = useMutation({
 
 <template>
   <div>
-    <v-toolbar :title="title">
+    <v-toolbar color="primary" :title="title">
       <v-btn icon="mdi-export" @click="mutation.mutate"></v-btn>
     </v-toolbar>
     <p class="text-center">Welcome, {{ authStore.name }}</p>

@@ -15,6 +15,9 @@ import { getLeave } from "@/api/leaves.ts";
 const authStore = useAuthStore();
 
 const date = ref(new Date())
+const selectedEvent = ref<CalendarEvent | null>(null)
+const selectedElement = ref<HTMLElement | null>(null)
+const selectedOpen = ref(false)
 
 const { isFetching, isError, data, error } = useQuery<getBookingResponse, AxiosError<{ message: string }>>({
   queryKey: ["booking", authStore.id, date],
@@ -44,7 +47,11 @@ const events = computed<CalendarEvent[]>(() => {
     end: new Date(booking.end_time),
     color: "blue",
     timed: true,
-    category: booking.doctor.name
+    category: booking.doctor.name,
+    details: {
+      patient_email: booking.patient.email,
+      doctor_email: booking.doctor.email,
+    }
   }));
 
   const leaveEvents = leaves.map((leave) => ({
@@ -53,7 +60,10 @@ const events = computed<CalendarEvent[]>(() => {
     end: new Date(leave.end_time),
     color: "red",
     timed: true,
-    category: leave.doctor.name
+    category: leave.doctor.name,
+    details: {
+      doctor_email: leave.doctor.email,
+    }
   }));
 
   return [...bookingEvents, ...leaveEvents];
@@ -62,6 +72,23 @@ const events = computed<CalendarEvent[]>(() => {
 const categories = computed<string[]>(() => {
   return [...new Set(events.value.map((event) => event.category))];
 });
+
+const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
+  const open = () => {
+    selectedEvent.value = event
+    if (nativeEvent.target instanceof HTMLElement) {
+      selectedElement.value = nativeEvent.target
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => selectedOpen.value = true))
+  }
+  if (selectedOpen.value) {
+    selectedOpen.value = false
+    requestAnimationFrame(() => requestAnimationFrame(() => open()))
+  } else {
+    open()
+  }
+  nativeEvent.stopPropagation()
+}
 </script>
 
 <template>
@@ -82,7 +109,30 @@ const categories = computed<string[]>(() => {
     </div>
 
     <div v-else>
-      <Calendar :events="events" :date="format(date, 'yyyy-MM-dd')" :categories="categories" />
+      <Calendar :events="events" :date="format(date, 'yyyy-MM-dd')" :categories="categories" :show-event="showEvent" />
     </div>
+
+    <v-menu v-if="selectedElement && selectedEvent" v-model="selectedOpen" :activator="selectedElement"
+      :close-on-content-click="false" location="end">
+      <v-card color="grey-lighten-4" min-width="350px" flat>
+        <v-toolbar :color="selectedEvent.color" dark>
+          <v-toolbar-title v-if="selectedEvent.color === 'red'" v-html="selectedEvent.name"></v-toolbar-title>
+          <v-toolbar-title v-else text="Appointment"></v-toolbar-title>
+          <v-btn icon @click="selectedOpen = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-title>{{ selectedEvent.category }}</v-card-title>
+        <v-card-subtitle>{{ selectedEvent.details.doctor_email }}</v-card-subtitle>
+        <v-card-text>
+          <p v-if="selectedEvent.color !== 'red'">
+            Patient: {{ selectedEvent.name }} ({{ selectedEvent.details.patient_email }})
+          </p>
+          <p>Start Time: <b>{{ format(selectedEvent.start, "dd MMM yyyy h:mm a") }}</b></p>
+          <p>End Time: <b>{{ format(selectedEvent.end, "dd MMM yyyy h:mm a") }}</b></p>
+        </v-card-text>
+      </v-card>
+    </v-menu>
+
   </div>
 </template>

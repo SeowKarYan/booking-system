@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import Toolbar from '@/components/Toolbar.vue';
 import { useRouter } from 'vue-router';
 import ErrorAlert from '@/components/ErrorAlert.vue';
@@ -21,6 +21,25 @@ const startTime = ref()
 const endTime = ref()
 const type = ref('')
 const validationError = ref('')
+const openDialog = ref(false)
+
+const combineDateAndTime = (date: Date, time: string) => {
+    if (!date || !time) {
+        return null
+    }
+
+    const [hour, minute] = time.split(":").map(Number)
+
+    return setHours(setMinutes(date, minute ?? 0), hour ?? 0)
+}
+
+const start = computed(() =>
+    combineDateAndTime(startDate.value, startTime.value)
+)
+
+const end = computed(() =>
+    combineDateAndTime(endDate.value, endTime.value)
+)
 
 const { isFetching, isError, data, error } = useQuery<getDoctorListResponse, AxiosError<{ message: string }>>({
     queryKey: ["doctor"],
@@ -40,17 +59,29 @@ const mutation = useMutation<
 
 const onSubmit = async () => {
     validationError.value = ''
-
-    let [startHour, startMinute] = startTime.value.split(":")
-    let [endHour, endMinute] = endTime.value.split(":")
-
-    let start = setHours(setMinutes(startDate.value, startMinute), startHour)
-    let end = setHours(setMinutes(endDate.value, endMinute), endHour)
-
-    if (start >= end) {
-        validationError.value = "End date and time should be more than start"
+    if (selectedDoctor.value && type.value && start.value && end.value) {
+        if (start.value >= end.value) {
+            validationError.value = "End date and time should be more than start"
+        } else {
+            openDialog.value = true
+        }
     }
 }
+
+const confirmSubmit = async () => {
+    if (selectedDoctor.value && type.value && start.value && end.value) {
+        let body = {
+            doctorId: selectedDoctor.value?.id,
+            type: type.value,
+            start_time: new Date(start.value).toISOString(),
+            end_time: new Date(end.value).toISOString(),
+        }
+
+        mutation.mutate(body);
+        openDialog.value = false
+    }
+}
+
 </script>
 
 <template>
@@ -58,8 +89,8 @@ const onSubmit = async () => {
         <Toolbar title="Apply Leave" />
 
         <v-container>
-            <ErrorAlert class="my-3" v-if="validationError || isError"
-                :text="validationError || error?.response?.data?.message || error?.message || ''" />
+            <ErrorAlert class="my-3" v-if="validationError || isError || mutation.isError.value"
+                :text="validationError || error?.response?.data?.message || error?.message || mutation.error?.value?.response?.data?.message || mutation.error?.value?.message || ''" />
 
             <v-form @submit.prevent="onSubmit">
                 <v-autocomplete v-model="selectedDoctor" :items="data?.data" item-title="name" item-value="id"
@@ -100,8 +131,20 @@ const onSubmit = async () => {
                     value => !!value || 'Please fill in reason',
                 ]"></v-text-field>
 
-                <v-btn class="mt-3" type="submit" color="primary" block>Submit</v-btn>
+                <v-btn class="mt-3" type="submit" color="primary" block
+                    :loading="mutation.isPending.value">Submit</v-btn>
             </v-form>
         </v-container>
+
+        <v-dialog v-model="openDialog" width="auto">
+            <v-card max-width="400" text="Are you sure you want to submit doctor leave?" title="Confirmation">
+                <v-card-actions>
+                    <v-btn text="Confirm" color="primary" @click="confirmSubmit"
+                        :loading="mutation.isPending.value"></v-btn>
+                    <v-btn text="Cancel" color="red" @click="openDialog = false"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
     </div>
 </template>

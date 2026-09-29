@@ -65,7 +65,7 @@ npm install
 ```
 
 ### Create `.env` file
-Create `.env` in the backend directory, put in your mySQL password in DB_PASSWORD
+Create `.env` file in the backend directory, put in your MySQL password in DB_PASSWORD
 ```
 # DATABASE
 DB_NAME=booking_system
@@ -83,9 +83,63 @@ PORT=5000
 FRONTEND_URL=http://localhost:5173
 ```
 
-### Running the Application
+# Database Setup
+## Create Database
+In backend directory, run *npm run db:create* command to create the database
+```
+npm run db:create
+```
+
+## Migration
+In backend directory, run *npm run db:migrate* command to create all the tables and columns in database
+```
+npm run db:migrate
+```
+
+## Seeder
+In backend directory, run *npm run db:seed* command to create data
+```
+npm run db:seed
+```
+
+If you want to undo the seeder, you can run *npm run db:seed:undo* command to delete all the data
+```
+npm run db:seed:undo
+```
+
+# Running the Application
 Inside the backend directory, run *npm run start* command to start the application, open `http://localhost:5000` in browser
 
 ```
 npm run start
 ```
+
+# Running Test Code
+Inside the backend directory, run *npm run test:run* command to run the backend test code.
+```
+npm run test:run
+```
+1 test will run, it will test when 2 patients booking same slot at the same time, only one booking will be created.
+
+Test Result: 
+![test-result](docs/test-result.png)
+
+# Login Account
+All the account generate by seeder will using `password` as password. These 2 accounts are the hardcoded account.
+| Role | Email | Password |
+|---|---|---|
+| Patient | patient@test.com | password
+| Receptionist | reception@test.com | password
+
+# Design Considerations
+## Preventing Double Booking
+The application uses database-level constraints with a unique index to prevent two requests from successfully booking the same doctor and time slot.
+
+## Render Slot with Reusable Component
+Calendar component is used in patient and receptionist page. It has a events props, in different view will render different event in calendar.
+
+| Role | Page | Events Props |
+|---|---|---|
+| Patient | Make Appointment | Available Slot
+| Patient | My Bookings | Booking Record
+| Receptionist | Doctor Schedule | Booking Record and Doctor Leave

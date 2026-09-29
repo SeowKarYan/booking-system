@@ -52,11 +52,11 @@ describe("POST /api/bookings/", () => {
         const availableSlotResponse = await agent
             .get(`/api/doctors/${doctor?.id}/slots?start_time=${start}&end_time=${end}`)
 
-        let startTime = availableSlotResponse.body.data[0].start;
+        let start_time = availableSlotResponse.body.data[0].start;
 
         const slot = {
             doctorId: doctor?.id,
-            startTime
+            start_time
         };
 
         const requestA = agent
@@ -83,7 +83,7 @@ describe("POST /api/bookings/", () => {
         const bookings = await Booking.findAll({
             where: {
                 doctorId: slot.doctorId,
-                start_time: new Date(slot.startTime)
+                start_time: new Date(slot.start_time)
             }
         });
 

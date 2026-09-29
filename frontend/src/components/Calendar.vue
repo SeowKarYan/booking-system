@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
-
+const focus = defineModel<string>('focus')
 const props = defineProps<{
-    date: string;
     events: CalendarEvent[];
     categories: string[];
     showEvent: (
@@ -10,16 +9,6 @@ const props = defineProps<{
         data: { event: CalendarEvent }
     ) => void
 }>();
-import { ref, watch } from 'vue'
-
-const focus = ref(props.date)
-
-watch(
-    () => props.date,
-    (newDate) => {
-        focus.value = newDate
-    }
-)
 
 const getEventColor = (event: CalendarEvent): string => {
     return event.color

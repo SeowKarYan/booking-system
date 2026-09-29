@@ -21,6 +21,10 @@ const selectedEvent = ref<CalendarEvent | null>(null)
 const selectedElement = ref<HTMLElement | null>(null)
 const selectedOpen = ref(false)
 
+const focus = computed(() => (
+    format(date.value, 'yyyy-MM-dd')
+))
+
 const { isFetching, isError, data, error } = useQuery<getDoctorListResponse, AxiosError<{ message: string }>>({
     queryKey: ["doctor"],
     queryFn: () => getDoctorList(),
@@ -117,8 +121,7 @@ const confirmBooking = async () => {
             </div>
 
             <div v-else>
-                <Calendar :events="events" :date="format(date, 'yyyy-MM-dd')" :categories="categories"
-                    :show-event="showEvent" />
+                <Calendar v-model:focus="focus" :events="events" :categories="categories" :show-event="showEvent" />
             </div>
         </div>
 

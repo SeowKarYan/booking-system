@@ -14,6 +14,10 @@ router.post("/", sessionAuthentication, async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Missing required fields", status: "failed" })
         }
 
+        if (start_time >= end_time) {
+            return res.status(400).json({ message: "End date and time should be more than start", status: "failed" })
+        }
+
         if (req.user?.role === "Patient") {
             return res.status(403).json({ message: "You are not allowed to create leaves", status: "failed" })
         }

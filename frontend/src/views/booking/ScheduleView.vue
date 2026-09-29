@@ -23,6 +23,10 @@ const selectedEvent = ref<CalendarEvent | null>(null)
 const selectedElement = ref<HTMLElement | null>(null)
 const selectedOpen = ref(false)
 
+const focus = computed(() => (
+  format(date.value, 'yyyy-MM-dd')
+))
+
 const { isFetching, isError, data, error } = useQuery<getBookingResponse, AxiosError<{ message: string }>>({
   queryKey: ["booking", authStore.id, date],
   queryFn: () => getBooking({
@@ -64,9 +68,9 @@ const events = computed<CalendarEvent[]>(() => {
     end: new Date(leave.end_time),
     color: "red",
     timed: true,
-    category: leave.doctor.name,
+    category: leave.doctor?.name,
     details: {
-      doctor_email: leave.doctor.email,
+      doctor_email: leave.doctor?.email,
     }
   }));
 
@@ -121,7 +125,7 @@ const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
     </div>
 
     <div v-else>
-      <Calendar :events="events" :date="format(date, 'yyyy-MM-dd')" :categories="categories" :show-event="showEvent" />
+      <Calendar v-model:focus="focus" :events="events" :categories="categories" :show-event="showEvent" />
     </div>
 
     <v-menu v-if="selectedElement && selectedEvent" v-model="selectedOpen" :activator="selectedElement"

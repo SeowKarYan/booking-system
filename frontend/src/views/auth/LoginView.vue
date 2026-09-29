@@ -15,6 +15,7 @@ const router = useRouter();
 const role = ref("Patient");
 const email = ref(null);
 const password = ref(null);
+let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const mutation = useMutation<
   loginResponse,
@@ -28,20 +29,6 @@ const mutation = useMutation<
   },
 });
 
-const emailRules = [
-  (value: string) => {
-    if (value) return true;
-    return "Please enter your email";
-  },
-];
-
-const passwordRules = [
-  (value: string) => {
-    if (value) return true;
-    return "Please enter your password";
-  },
-];
-
 const switchRole = () => {
   if (role.value === "Patient") {
     role.value = "Receptionist";
@@ -51,7 +38,7 @@ const switchRole = () => {
 };
 
 const onSubmit = async () => {
-  if (email.value && password.value) {
+  if (email.value && password.value && emailRegex.test(email.value)) {
     let body = {
       email: email.value,
       password: password.value,
@@ -70,11 +57,14 @@ const onSubmit = async () => {
         :text="mutation.error?.value?.response?.data?.message || mutation.error?.value?.message || ''" />
       <v-card-title class="text-h5">{{ role }} Login</v-card-title>
       <v-form @submit.prevent="onSubmit">
-        <v-text-field type="email" v-model="email" label="Email" :rules="emailRules"
-          :readonly="mutation.isPending.value"></v-text-field>
-        <v-text-field type="password" v-model="password" label="Password" :rules="passwordRules"
-          :readonly="mutation.isPending.value"></v-text-field>
-        <v-btn class="mt-3" type="submit" color="blue-darken-1" block :loading="mutation.isPending.value">Login</v-btn>
+        <v-text-field type="email" v-model="email" label="Email" :readonly="mutation.isPending.value" :rules="[
+          value => !!value || 'Please fill in email address',
+          value => emailRegex.test(value) || 'Invalid email format'
+        ]"></v-text-field>
+        <v-text-field type="password" v-model="password" label="Password" :readonly="mutation.isPending.value" :rules="[
+          value => !!value || 'Please fill in password',
+        ]"></v-text-field>
+        <v-btn class="mt-3" type="submit" color="primary" block :loading="mutation.isPending.value">Login</v-btn>
 
         <p class="text-center" @click="switchRole">
           <u>Login as {{ role === "Patient" ? "Receptionist" : "Patient" }}?</u>

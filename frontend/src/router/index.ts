@@ -25,12 +25,16 @@ const router = createRouter({
       name: 'leave',
       component: () => import('../views/leave/ApplyLeaveView.vue'),
     },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: "/",
+    },
   ],
 })
 
 router.beforeEach(async (to, from) => {
   const authStore = useAuthStore();
-  if(!authStore.isLoggedIn && !authStore.checkedSession && to.name !== 'login') {
+  if (!authStore.isLoggedIn && !authStore.checkedSession && to.name !== 'login') {
     await authStore.checkUserSession();
   }
 

@@ -11,6 +11,7 @@ import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
 import type { createBookingRequest, createBookingResponse } from '@/types/bookings';
 import { createBooking } from '@/api/bookings';
 import { useRouter } from 'vue-router';
+import ErrorAlert from '@/components/ErrorAlert.vue';
 
 const router = useRouter();
 
@@ -100,10 +101,8 @@ const confirmBooking = async () => {
         <Toolbar title="Make Appointment" />
 
         <v-container>
-            <v-alert v-if="isError || isSlotError" class="my-3" title="Error"
-                :text="error?.response?.data?.message || error?.message || slotError?.response?.data?.message || slotError?.message"
-                type="error" color="red-darken-1" closable density="compact">
-            </v-alert>
+            <ErrorAlert class="my-3" v-if="isError || isSlotError"
+                :text="error?.response?.data?.message || error?.message || slotError?.response?.data?.message || slotError?.message || ''" />
 
             <v-autocomplete v-model="selectedDoctor" :items="data?.data" item-title="name" item-value="id" return-object
                 label="Doctor" :loading="isFetching">
@@ -133,9 +132,8 @@ const confirmBooking = async () => {
                     </v-btn>
                 </v-toolbar>
                 <v-container v-if="mutation.isError.value">
-                    <v-alert title="Error" :text="mutation.error?.value?.response?.data?.message ||
-                        mutation.error?.value?.message
-                        " type="error" color="red-darken-1" closable density="compact"></v-alert>
+                    <ErrorAlert
+                        :text="mutation.error?.value?.response?.data?.message || mutation.error?.value?.message || ''" />
                 </v-container>
                 <v-card-title>Confirmation</v-card-title>
                 <v-card-subtitle>Are you sure you want to make appointment with following details?</v-card-subtitle>

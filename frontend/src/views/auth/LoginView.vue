@@ -6,6 +6,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import type { AxiosError } from "axios";
 import type { loginRequest, loginResponse } from "@/types/auth";
+import ErrorAlert from "@/components/ErrorAlert.vue";
 
 const authStore = useAuthStore();
 
@@ -63,48 +64,17 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <v-container
-    fluid
-    class="fill-height bg-blue-lighten-5 d-flex align-center justify-center"
-    min-height="100vh"
-  >
+  <v-container fluid class="fill-height bg-blue-lighten-5 d-flex align-center justify-center" min-height="100vh">
     <v-card class="px-6 py-8 flex-grow-1" max-width="344">
-      <v-alert
-        v-if="mutation.isError.value"
-        title="Error"
-        :text="
-          mutation.error?.value?.response?.data?.message ||
-          mutation.error?.value?.message
-        "
-        type="error"
-        color="red-darken-1"
-        closable
-        density="compact"
-      ></v-alert>
+      <ErrorAlert v-if="mutation.isError.value"
+        :text="mutation.error?.value?.response?.data?.message || mutation.error?.value?.message || ''" />
       <v-card-title class="text-h5">{{ role }} Login</v-card-title>
       <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          type="email"
-          v-model="email"
-          label="Email"
-          :rules="emailRules"
-          :readonly="mutation.isPending.value"
-        ></v-text-field>
-        <v-text-field
-          type="password"
-          v-model="password"
-          label="Password"
-          :rules="passwordRules"
-          :readonly="mutation.isPending.value"
-        ></v-text-field>
-        <v-btn
-          class="mt-3"
-          type="submit"
-          color="blue-darken-1"
-          block
-          :loading="mutation.isPending.value"
-          >Login</v-btn
-        >
+        <v-text-field type="email" v-model="email" label="Email" :rules="emailRules"
+          :readonly="mutation.isPending.value"></v-text-field>
+        <v-text-field type="password" v-model="password" label="Password" :rules="passwordRules"
+          :readonly="mutation.isPending.value"></v-text-field>
+        <v-btn class="mt-3" type="submit" color="blue-darken-1" block :loading="mutation.isPending.value">Login</v-btn>
 
         <p class="text-center" @click="switchRole">
           <u>Login as {{ role === "Patient" ? "Receptionist" : "Patient" }}?</u>

@@ -12,6 +12,7 @@ import type { CalendarEvent } from "vuetify/lib/components/VCalendar/types.mjs";
 import type { getLeaveResponse } from "@/types/leaves.ts";
 import { getLeave } from "@/api/leaves.ts";
 import { useRouter } from "vue-router";
+import ErrorAlert from "@/components/ErrorAlert.vue";
 
 const authStore = useAuthStore();
 
@@ -109,10 +110,8 @@ const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
     </div>
 
     <v-container>
-      <v-alert v-if="isError || isLeaveError" class="mb-3" title="Error"
-        :text="error?.response?.data?.message || error?.message || leaveError?.response?.data?.message || leaveError?.message"
-        type="error" color="red-darken-1" closable density="compact">
-      </v-alert>
+      <ErrorAlert class="my-3" v-if="isError || isLeaveError"
+        :text="error?.response?.data?.message || error?.message || leaveError?.response?.data?.message || leaveError?.message || ''" />
 
       <v-date-input label="Select Date" v-model="date"></v-date-input>
     </v-container>

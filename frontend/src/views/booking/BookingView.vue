@@ -20,6 +20,7 @@ const date = ref(new Date())
 const selectedEvent = ref<CalendarEvent | null>(null)
 const selectedElement = ref<HTMLElement | null>(null)
 const selectedOpen = ref(false)
+const showError = ref(false)
 
 const focus = computed(() => (
     format(date.value, 'yyyy-MM-dd')
@@ -62,6 +63,7 @@ const categories = computed<string[]>(() => {
 });
 
 const showEvent = (nativeEvent: Event, { event }: { event: CalendarEvent }) => {
+    showError.value = false
     const open = () => {
         selectedEvent.value = event
         if (nativeEvent.target instanceof HTMLElement) {
@@ -91,6 +93,7 @@ const mutation = useMutation<
 
 const confirmBooking = async () => {
     if (selectedDoctor.value?.id && selectedEvent) {
+        showError.value = true
         let body = {
             doctorId: selectedDoctor.value?.id,
             start_time: selectedEvent.value?.start
@@ -134,7 +137,7 @@ const confirmBooking = async () => {
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-container v-if="mutation.isError.value">
+                <v-container v-if="showError && mutation.isError.value">
                     <ErrorAlert
                         :text="mutation.error?.value?.response?.data?.message || mutation.error?.value?.message || ''" />
                 </v-container>

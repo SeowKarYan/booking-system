@@ -114,6 +114,21 @@ Inside the backend directory, run *npm run start* command to start the applicati
 npm run start
 ```
 
+# Running in development mode
+Everytime change the code, it will restart and update
+## Frontend
+Inside frontend directory, run *npm run dev* command
+```
+cd frontend
+npm run dev
+```
+## Backend
+Inside backend directory, run *npm run dev* command
+```
+cd backend
+npm run dev
+```
+
 # Running Test Code
 Inside the backend directory, run *npm run test:run* command to run the backend test code.
 ```
@@ -122,6 +137,7 @@ npm run test:run
 1 test will run, it will test when 2 patients booking same slot at the same time, only one booking will be created.
 
 Test Result: 
+
 ![test-result](docs/test-result.png)
 
 # Login Account
